@@ -1,0 +1,53 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Testing
+/coverage
+
+# Next.js build output
+/.next/
+/out/
+/build
+/dist
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Production & Cache
+.cache/
+
+# Environment variables
+.env
+.env*.local
+!.env.example
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Vercel
+.vercel
+
+# IDE & Editor files
+.idea/
+*.swp
+*.swo
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# SQLite runtime journal files
+*.db-journal
+*.sqlite3-journal
