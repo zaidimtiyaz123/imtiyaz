@@ -85,10 +85,13 @@ export async function appendContactInquiry(data: {
   timeline: string;
   message: string;
 }): Promise<void> {
+  console.log('[Excel] Starting appendContactInquiry for:', data.name);
   const workbook = await getOrCreateWorkbook();
   const sheet = ensureContactSheet(workbook);
   
-  const nextId = sheet.rowCount > 0 ? (sheet.getRow(sheet.rowCount).getCell('id').value as number || 0) + 1 : 1;
+  console.log('[Excel] Sheet rowCount before:', sheet.rowCount);
+  const nextId = sheet.rowCount;
+  console.log('[Excel] Next ID:', nextId);
   
   const row = sheet.addRow({
     id: nextId,
@@ -105,6 +108,8 @@ export async function appendContactInquiry(data: {
     updated_at: new Date().toISOString(),
   });
   
+  console.log('[Excel] Sheet rowCount after addRow:', sheet.rowCount);
+  
   row.eachCell((cell) => {
     cell.border = {
       top: { style: 'thin' },
@@ -115,7 +120,9 @@ export async function appendContactInquiry(data: {
     cell.alignment = { vertical: 'middle', wrapText: true };
   });
   
+  console.log('[Excel] Writing file to:', EXCEL_FILE_PATH);
   await workbook.xlsx.writeFile(EXCEL_FILE_PATH);
+  console.log('[Excel] File written successfully');
 }
 
 export async function appendNewsletterSubscription(email: string): Promise<void> {
@@ -127,7 +134,7 @@ export async function appendNewsletterSubscription(email: string): Promise<void>
     return;
   }
   
-  const nextId = sheet.rowCount > 0 ? (sheet.getRow(sheet.rowCount).getCell('id').value as number || 0) + 1 : 1;
+  const nextId = sheet.rowCount;
   
   const row = sheet.addRow({
     id: nextId,

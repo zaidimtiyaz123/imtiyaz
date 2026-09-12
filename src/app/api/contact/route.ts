@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createContactInquiry } from '@/lib/db';
 import { appendContactInquiry } from '@/lib/excel';
+import { sendContactInquiryEmail } from '@/lib/email';
 
 const contactSchema = z.object({
   name: z.string().min(2),
@@ -37,6 +38,17 @@ export async function POST(request: NextRequest) {
     });
     
     console.log('New contact inquiry saved to database and Excel:', inquiry);
+
+    await sendContactInquiryEmail({
+      name: validatedData.name,
+      email: validatedData.email,
+      phone: validatedData.phone,
+      company: validatedData.company || undefined,
+      service: validatedData.service,
+      budget: validatedData.budget,
+      timeline: validatedData.timeline,
+      message: validatedData.message,
+    });
 
     return NextResponse.json(
       { success: true, message: 'Inquiry submitted successfully', data: inquiry },
