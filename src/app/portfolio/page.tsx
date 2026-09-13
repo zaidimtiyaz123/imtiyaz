@@ -10,6 +10,7 @@ import { ArrowRight, ExternalLink, Star, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { patternBgClass } from '@/lib/patterns';
+import Image from 'next/image';
 
 export default function PortfolioPage() {
   const { t } = useLanguage();
@@ -83,11 +84,12 @@ export default function PortfolioPage() {
               >
                 <Card variant="elevated" hover padding="none" className="h-full overflow-hidden group">
                   <div className="relative aspect-video overflow-hidden">
-                    <img
+                    <Image
                       src={project.image}
                       alt={project.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      loading="lazy"
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     
@@ -101,7 +103,13 @@ export default function PortfolioPage() {
                     <div className="absolute bottom-0 left-0 right-0 p-6">
                       <div className="flex items-center gap-2 text-white/80 text-sm">
                         {project.clientLogo && (
-                          <img src={project.clientLogo} alt={project.clientName} className="h-6 w-auto opacity-80" />
+                          <Image
+                            src={project.clientLogo}
+                            alt={project.clientName}
+                            width={32}
+                            height={20}
+                            className="h-6 w-auto opacity-80"
+                          />
                         )}
                         <span>{project.clientName}</span>
                       </div>
@@ -129,9 +137,11 @@ export default function PortfolioPage() {
                           &quot;{project.testimonial.content}&quot;
                         </p>
                         <div className="flex items-center gap-2">
-                          <img
+                          <Image
                             src={project.testimonial.avatar}
                             alt={project.testimonial.name}
+                            width={32}
+                            height={32}
                             className="w-8 h-8 rounded-full object-cover"
                           />
                           <div>

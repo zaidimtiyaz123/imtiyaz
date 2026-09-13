@@ -7,28 +7,34 @@ const __dirname = path.dirname(__filename);
 
 const dbPath = path.join(__dirname, '..', '..', 'data', 'crate_projects.db');
 
-const db = new Database(dbPath);
+let db: Database.Database | null = null;
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS contacts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    email TEXT NOT NULL,
-    phone TEXT NOT NULL,
-    company TEXT,
-    service TEXT NOT NULL,
-    budget TEXT NOT NULL,
-    timeline TEXT NOT NULL,
-    message TEXT NOT NULL,
-    status TEXT DEFAULT 'new',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
+function getDb(): Database.Database {
+  if (!db) {
+    db = new Database(dbPath);
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS contacts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        company TEXT,
+        service TEXT NOT NULL,
+        budget TEXT NOT NULL,
+        timeline TEXT NOT NULL,
+        message TEXT NOT NULL,
+        status TEXT DEFAULT 'new',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
 
-  CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email);
-  CREATE INDEX IF NOT EXISTS idx_contacts_status ON contacts(status);
-  CREATE INDEX IF NOT EXISTS idx_contacts_created_at ON contacts(created_at);
-`);
+      CREATE INDEX IF NOT EXISTS idx_contacts_email ON contacts(email);
+      CREATE INDEX IF NOT EXISTS idx_contacts_status ON contacts(status);
+      CREATE INDEX IF NOT EXISTS idx_contacts_created_at ON contacts(created_at);
+    `);
+  }
+  return db;
+}
 
 export interface ContactInquiry {
   id: number;
@@ -46,7 +52,8 @@ export interface ContactInquiry {
 }
 
 export function createContactInquiry(data: Omit<ContactInquiry, 'id' | 'status' | 'created_at' | 'updated_at'>): ContactInquiry {
-  const stmt = db.prepare(`
+  const database = getDb();
+  const stmt = database.prepare(`
     INSERT INTO contacts (name, email, phone, company, service, budget, timeline, message)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `);
@@ -62,20 +69,30 @@ export function createContactInquiry(data: Omit<ContactInquiry, 'id' | 'status' 
     data.message
   );
 
-  const inquiry = db.prepare('SELECT * FROM contacts WHERE id = ?').get(result.lastInsertRowid) as ContactInquiry;
+  const inquiry = database.prepare('SELECT * FROM contacts WHERE id = ?').get(result.lastInsertRowid) as ContactInquiry;
   return inquiry;
 }
 
 export function getContactInquiries(): ContactInquiry[] {
-  return db.prepare('SELECT * FROM contacts ORDER BY created_at DESC').all() as ContactInquiry[];
+  const database = getDb();
+  return database.prepare('SELECT * FROM contacts ORDER BY created_at DESC').all() as ContactInquiry[];
 }
 
 export function getContactInquiryById(id: number): ContactInquiry | undefined {
-  return db.prepare('SELECT * FROM contacts WHERE id = ?').get(id) as ContactInquiry | undefined;
+  const database = getDb();
+  return database.prepare('SELECT * FROM contacts WHERE id = ?').get(id) as ContactInquiry | undefined;
 }
 
 export function updateContactStatus(id: number, status: string): void {
-  db.prepare('UPDATE contacts SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(status, id);
+  const database = getDb();
+  database.prepare('UPDATE contacts SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(status, id);
 }
 
-export default db;
+export function closeDb(): void {
+  if (db) {
+    db.close();
+    db = null;
+  }
+}
+
+export default getDb;

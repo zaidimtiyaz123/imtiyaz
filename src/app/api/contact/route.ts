@@ -3,23 +3,55 @@ import { z } from 'zod';
 import { createContactInquiry } from '@/lib/db';
 import { appendContactInquiry } from '@/lib/excel';
 import { sendContactInquiryEmail } from '@/lib/email';
+import { sendContactInquiryWhatsApp } from '@/lib/whatsapp';
+import { contactRateLimiter } from '@/lib/rate-limit';
+import { csrfProtection } from '@/lib/csrf';
 
 const contactSchema = z.object({
-  name: z.string().min(2),
+  name: z.string().min(2).max(100),
   email: z.string().email(),
-  phone: z.string().min(10),
-  company: z.string().optional(),
-  service: z.string().min(1),
-  budget: z.string().min(1),
-  timeline: z.string().min(1),
-  message: z.string().min(20),
+  phone: z.string().min(10).max(20),
+  company: z.string().max(100).optional(),
+  service: z.string().min(1).max(50),
+  budget: z.string().min(1).max(50),
+  timeline: z.string().min(1).max(50),
+  message: z.string().min(20).max(5000),
 });
 
+function sanitizeInput(input: string): string {
+  return input
+    .replace(/[<>]/g, '')
+    .replace(/javascript:/gi, '')
+    .replace(/on\w+=/gi, '')
+    .trim();
+}
+
 export async function POST(request: NextRequest) {
+  const csrfResponse = await csrfProtection(request);
+  if (csrfResponse) {
+    return csrfResponse;
+  }
+
+  const rateLimitResponse = await contactRateLimiter(request);
+  if (rateLimitResponse) {
+    return rateLimitResponse;
+  }
+
   try {
     const body = await request.json();
     
-    const validatedData = contactSchema.parse(body);
+    const sanitizedBody = {
+      name: sanitizeInput(body.name || ''),
+      email: sanitizeInput(body.email || '').toLowerCase(),
+      phone: sanitizeInput(body.phone || ''),
+      company: body.company ? sanitizeInput(body.company) : undefined,
+      service: sanitizeInput(body.service || ''),
+      budget: sanitizeInput(body.budget || ''),
+      timeline: sanitizeInput(body.timeline || ''),
+      message: sanitizeInput(body.message || ''),
+    };
+
+    const validatedData = contactSchema.parse(sanitizedBody);
 
     const inquiry = createContactInquiry({
       ...validatedData,
@@ -50,8 +82,19 @@ export async function POST(request: NextRequest) {
       message: validatedData.message,
     });
 
+    const whatsappSent = await sendContactInquiryWhatsApp({
+      name: validatedData.name,
+      email: validatedData.email,
+      phone: validatedData.phone,
+      company: validatedData.company || undefined,
+      service: validatedData.service,
+      budget: validatedData.budget,
+      timeline: validatedData.timeline,
+      message: validatedData.message,
+    });
+
     return NextResponse.json(
-      { success: true, message: 'Inquiry submitted successfully', data: inquiry },
+      { success: true, message: 'Inquiry submitted successfully', data: inquiry, whatsappSent },
       { status: 200 }
     );
   } catch (error) {

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 import { navItems, companyInfo } from '@/data';
+import { getWhatsAppUrl } from '@/lib/utils';
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -200,9 +201,4 @@ export function Header() {
       </nav>
     </header>
   );
-}
-
-function getWhatsAppUrl(phone: string): string {
-  const cleanPhone = phone.replace(/\D/g, '');
-  return `https://wa.me/${cleanPhone}`;
 }

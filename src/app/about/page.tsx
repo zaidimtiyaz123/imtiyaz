@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { ArrowRight, CheckCircle, Shield, Award, Users, Globe, Lightbulb, Heart, Target, Zap } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { patternBgClass } from '@/lib/patterns';
 
@@ -209,10 +210,12 @@ export default function AboutPage() {
               >
                 <Card variant="elevated" hover padding="none" className="overflow-hidden">
                   <div className="aspect-square overflow-hidden">
-                    <img
+                    <Image
                       src={member.avatar}
                       alt={member.name}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                      fill
+                      className="object-cover transition-transform duration-500 hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                   </div>
                   <CardContent className="space-y-4">

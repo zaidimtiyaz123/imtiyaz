@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'bordered' | 'elevated' | 'outlined';
-  padding?: 'none' | 'sm' | 'md' | 'lg';
+  padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
   hover?: boolean;
 }
 
@@ -23,6 +23,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       sm: 'p-4',
       md: 'p-6',
       lg: 'p-8',
+      xl: 'p-10',
     };
 
     const hoverStyles = hover

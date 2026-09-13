@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { patternBgClass } from '@/lib/patterns';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 
 export default function TemplatePreviewPage() {
   const params = useParams();
@@ -163,10 +164,12 @@ export default function TemplatePreviewPage() {
                 viewport={{ once: true }}
               >
                 <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl border border-gray-100 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-                  <img
+                  <Image
                     src={template.image}
                     alt={`${template.name} preview`}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="100vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                   <div className="absolute bottom-6 left-6 right-6">

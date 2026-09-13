@@ -10,6 +10,7 @@ import { ArrowRight, Check, Star, ExternalLink, Filter, X } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { patternBgClass } from '@/lib/patterns';
+import Image from 'next/image';
 
 export default function TemplatesPage() {
   const { t } = useLanguage();
@@ -101,11 +102,12 @@ export default function TemplatesPage() {
               >
                 <Card variant="elevated" hover padding="none" className="h-full overflow-hidden group relative">
                   <div className="relative aspect-video overflow-hidden">
-                    <img
+                    <Image
                       src={template.image}
                       alt={template.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      loading="lazy"
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     

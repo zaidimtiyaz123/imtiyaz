@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
 import { portfolio } from '@/data';
+import Image from 'next/image';
 
 interface PortfolioDetailPageProps {
   params: {
@@ -47,10 +48,12 @@ export default function PortfolioDetailPage({ params }: PortfolioDetailPageProps
 
           <div className="max-w-5xl mx-auto">
             <div className="relative aspect-video rounded-2xl overflow-hidden mb-8">
-              <img
+              <Image
                 src={project.image}
                 alt={project.title}
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                sizes="100vw"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
             </div>
@@ -94,7 +97,13 @@ export default function PortfolioDetailPage({ params }: PortfolioDetailPageProps
                 <Card variant="bordered" padding="lg">
                   <div className="flex items-center gap-4 mb-4">
                     {project.clientLogo && (
-                      <img src={project.clientLogo} alt={project.clientName} className="h-10 w-auto" />
+                      <Image
+                        src={project.clientLogo}
+                        alt={project.clientName}
+                        width={80}
+                        height={40}
+                        className="h-10 w-auto"
+                      />
                     )}
                     <div>
                       <p className="font-medium text-gray-900 dark:text-white">{project.clientName}</p>
